@@ -2,11 +2,16 @@
 
 // Define
 // SS=超音波センサー
-// R=右、L=左、E=エコー、T=トリガー
+// L=左、R=右、C=センター、B=後ろ、E=エコー、T=トリガー
 #define SS_L_E_PIN 2
 #define SS_L_T_PIN 3
 #define SS_R_E_PIN 4
 #define SS_R_T_PIN 5
+#define PR_L1_PIN A0
+#define PR_L2_PIN A1
+#define PR_R1_PIN A2
+#define PR_R2_PIN A3
+#define PR_C_PIN A4
 
 // 変数定義
 // カラーセンサー系
@@ -18,42 +23,21 @@ int rr;
 int rg;
 int rb;
 int rir;
+int l;
+int r;
 // 超音波センサー
 double SS_L_DU = 0;
 double SS_L_DI = 0;
 double SS_R_DU = 0;
 double SS_R_DI = 0;
 
-// 任意の文字で区切る関数
-int split(String data, char delimiter, String *dst) {
-  int index = 0;
-  int arraySize = (sizeof(data) / sizeof((data)[0]));
-  int datalength = data.length();
-  for (int i = 0; i < datalength; i++) {
-    char tmp = data.charAt(i);
-    if (tmp == delimiter) {
-      index++;
-      if (index > (arraySize - 1))
-        return -1;
-    } else
-      dst[index] += tmp;
-  }
-  return (index + 1);
-}
-
 // シリアルから流れ込んでくるmicroからのi2cのデータを読む
 void readserial() {
-  String tmp = Serial.readStringUntil('\n');
-  String *spltmp;
-  split(tmp, '\n', spltmp);
-  lr = spltmp[0].toInt();
-  lg = spltmp[1].toInt();
-  lb = spltmp[2].toInt();
-  lir = spltmp[3].toInt();
-  rr = spltmp[4].toInt();
-  rg = spltmp[5].toInt();
-  rb = spltmp[6].toInt();
-  rir = spltmp[7].toInt();
+  if (Serial.available() > 0) {
+    String tmp = Serial.readStringUntil('\n');
+    l = tmp.toInt() / 10;
+    r = tmp.toInt() - l * 10;
+  }
 }
 
 // 超音波センサーの値を読む
